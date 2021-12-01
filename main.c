@@ -1,37 +1,10 @@
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-int main(int argc, char **argv)
-{
-    // Load config files, if any.
-
-    // Run command loop..
-    lsh_loop();
-
-    //Perform any shutdown/clenaup.
-
-    return EXIT_SUCCESS;
-}
-
-void lsh_loop(void)
-{
-    char *line;
-    char **args;
-    int status;
-
-    do {
-        printf("> ");
-        line = lsh_read_line();
-        args = lsh_split_line(line);
-        status = lsh_execute(args);
-
-        free(line);
-        free(args);
-    } while (status);
-    }
 
     #define LSH_RL_BUFSIZE 1024
     char *lsh_read_line(void)
@@ -139,7 +112,7 @@ void lsh_loop(void)
                       // Parent process
                       do {
                           wpid = waitpid(pid, &status, WUNTRACED);
-                      }while (!WIFEXITED(status) && !WIFSIGNALED(status));
+                      } while (!WIFEXITED(status) && !WIFSIGNALED(status));
                       }
 
                       return 1;
@@ -208,6 +181,32 @@ void lsh_loop(void)
 
                       return lsh_launch(args);
                   }
-          
-      
+    void lsh_loop(void)
+    {
+    char *line;
+    char **args;
+    int status;
+
+    do {
+        printf("> ");
+        line = lsh_read_line();
+        args = lsh_split_line(line);
+        status = lsh_execute(args);
+
+        free(line);
+        free(args);
+    } while (status);
+    }
+      int main(int argc, char **argv)
+    {
+    // Load config files, if any.
+
+    // Run command loop..
+    lsh_loop();
+
+    //Perform any shutdown/clenaup.
+
+    return EXIT_SUCCESS;
+}
+
 
