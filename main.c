@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
+    //Reading a line
     #define LSH_RL_BUFSIZE 1024
     char *lsh_read_line(void)
     {
@@ -43,23 +43,7 @@
          }
       }
 
-      char *lsh_read_line(void)
-      {
-          char *line = NULL;
-          ssize_t bufsize = 0; // have getline allocate a buffer for us
-
-          if (getline(&line, &bufsize, stdin) == -1){
-              if(feof(stdin)) {
-                  exit(EXIT_SUCCESS); // We received an EOF
-              } else {
-                  perror("readline");
-                  exit(EXIT_FAILURE);
-              }
-              }
-
-              return line;
-          }
-
+      // Parsing the line
           #define LSH_TOK_BUFSIZE 64
           #define LSH_TOK_DELIM " \t\r\n\a"
           char **lsh_split_line(char *line)
@@ -86,13 +70,13 @@
                           exit(EXIT_FAILURE);
                       }
                   }
-
                   token = strtok(NULL, LSH_TOK_DELIM);
               }
               tokens[position] = NULL;
               return tokens;
               }
 
+              // Launching the shell process
               int lsh_launch(char **args)
               {
                   pid_t pid, wpid;
@@ -117,11 +101,13 @@
 
                       return 1;
                   }
-                  
+
+                   // Function declarations for builtin shell commands
                   int lsh_cd(char **args);
                   int lsh_help(char **args);
                   int lsh_exit(char **args);
 
+                    //List of builtin commands and their functions
                   char *builtin_str[] = {
                       "cd",
                       "help",
@@ -134,17 +120,24 @@
                       &lsh_exit
                   };
 
-                  int(*builtin_func[]) (char **) = {
-                      &lsh_cd,
-                      &lsh_help,
-                      &lsh_exit
-                  };
-
                   int lsh_num_builtins() {
                       return sizeof(builtin_str) / sizeof(char *);
                   }
 
-                  int lsh_help(char **args)
+                  /*
+                  Builtin function implementations
+                  */
+                 int lsh_cd(char **args){
+                     if (args[1] == NULL){
+                         fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+                     } else {
+                         if (chdir(args[1]) !=0){
+                             perror("lsh");
+                         }
+                     }return 1;
+                }
+
+                 int lsh_help(char **args)
                   {
                       int i;
                       printf("Stephen Brennan's LSH\n");
@@ -179,34 +172,31 @@
                           }
                   }
 
-                      return lsh_launch(args);
+                  return lsh_launch(args);
                   }
-    void lsh_loop(void)
-    {
-    char *line;
-    char **args;
-    int status;
 
-    do {
-        printf("> ");
-        line = lsh_read_line();
-        args = lsh_split_line(line);
-        status = lsh_execute(args);
+                // Basic loop of a shell
 
-        free(line);
-        free(args);
-    } while (status);
-    }
-      int main(int argc, char **argv)
-    {
-    // Load config files, if any.
-
-    // Run command loop..
-    lsh_loop();
-
-    //Perform any shutdown/clenaup.
-
-    return EXIT_SUCCESS;
-}
-
-
+            void lsh_loop(void)
+            {
+                char *line;
+                char **args;
+                int status;
+                do {
+                   printf("> ");
+                   line = lsh_read_line();
+                   args = lsh_split_line(line);
+                   status = lsh_execute(args);
+                   
+                   free(line);
+                   free(args);
+                   } while (status);
+                    }
+                    int main(int argc, char **argv)
+                    {
+                        // Load config files, if any.
+                        // Run command loop..
+                        lsh_loop();
+                        //Perform any shutdown/clenaup.
+                        return EXIT_SUCCESS;
+                        }
