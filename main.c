@@ -141,7 +141,7 @@
                   {
                       int i;
                       printf("Krista Zargarian's LSH\n");
-                      printf("{Type program names and arguments, and hit enter.\n");
+                      printf("Type program names and arguments, and hit enter.\n");
                       printf("The following are built in:\n");
 
                       for (i = 0; i < lsh_num_builtins(); i++) {
